@@ -1,0 +1,61 @@
+version: "3.8"
+services:
+    notification-service:
+        build:
+            context: ./notification-service
+        ports:
+            - 5000:5000
+        networks:
+            - alon-network
+    order-service:
+        build:
+            context: ./order-service
+        ports:
+            - 5001:5001
+        networks:
+            - alon-network
+    payment-service:
+        build:
+            context: ./payment-service
+        ports:
+            - 5002:5002
+        networks:
+            - alon-network
+    product-service:
+        build:
+            context: ./product-service
+        ports:
+            - 5003:5003
+        networks:
+            - alon-network
+    shopping-cart-service:
+        build:
+            context: ./shopping-cart-service
+        ports:
+            - 5004:5004
+        networks:
+            - alon-network
+    user-service:
+        build:
+            context: ./user-service
+        ports:
+            - 5005:5005
+        networks:
+            - alon-network
+        depends_on:
+            - mongo
+
+    mongo:
+        image: mongo
+        ports:
+            - 27017:27017
+        volumes:
+            - mongo:/data/db
+        networks:
+            - alon-network
+
+volumes:
+    mongo:
+
+networks:
+    alon-network:
