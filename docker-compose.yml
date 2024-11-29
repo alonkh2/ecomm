@@ -53,6 +53,10 @@ services:
             - mongo:/data/db
         networks:
             - alon-network
+    redis:
+      image: redis
+      ports:
+        - 
 
 volumes:
     mongo:
