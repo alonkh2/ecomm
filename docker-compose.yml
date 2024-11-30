@@ -43,7 +43,6 @@ services:
             - alon-network
         depends_on:
             - mongo
-            - authentication_service
         environment:
             - SECRET_KEY=${SECRET_KEY}
             - USER_PORT=${USER_PORT}

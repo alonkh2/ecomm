@@ -1,11 +1,12 @@
-FROM node:22
-
+FROM alon-base
 
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
 COPY . .
+
+RUN npm install
 
 RUN npm run build
 

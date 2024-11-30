@@ -1,8 +1,10 @@
 import express, { NextFunction, Request, Response, Express } from "express";
 import jwt from "jsonwebtoken";
+import { decodeToken } from "./jwt-utils";
+import { JobContext } from "./job-context";
 
-const jwtHandler = async (
-	req: Request,
+export const jwtHandler = async (
+	req: RequestWithContext,
 	res: Response,
 	next: NextFunction
 ) => {
@@ -14,20 +16,24 @@ const jwtHandler = async (
 		return;
 	}
 
-	const accessTokenPayload = jwt.verify(
-		accessToken as string,
-		process.env.ACCESS_TOKEN_KEY || ""
-	) as jwt.JwtPayload;
+	console.error(process.env.SECRET_KEY);
+
+	const accessTokenPayload = decodeToken(accessToken);
 
 	if (!accessTokenPayload) {
 		res.status(401).send("Unauthorized");
 	}
 
-	req.userId = accessTokenPayload.userId;
+	req.jobContext = accessTokenPayload;
+
+	console.log(req);
 
 	next();
 };
 
-export const useJwtHandler = (app: Express) => {
-	app.use(jwtHandler);
+export interface RequestWithContext extends Request {
+	jobContext?: JobContext;
 }
+
+export * from "./jwt-utils";
+export * from "./job-context";

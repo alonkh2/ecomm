@@ -1,6 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
 import router from "./api/users";
+import r from "base";
 
 const app = express();
 app.use(express.json());
@@ -14,5 +15,7 @@ mongoose.connect("mongodb://mongo:27017/users").then(() => {
 		console.log(`user service is running on port ${PORT}`);
 	});
 });
+
+console.log(process.env);
 
 export default app;

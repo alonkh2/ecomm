@@ -1,5 +1,4 @@
-FROM node:22
-
+FROM alon-base
 
 WORKDIR /app
 COPY package*.json ./

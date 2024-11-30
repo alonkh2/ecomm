@@ -2,12 +2,13 @@ import express from "express";
 import { TypedRequestBody } from "./types/express";
 import { RegisterRequest } from "./types/register-request";
 import user from "../db/user";
-import jwt from "jsonwebtoken";
+import { jwtHandler, RequestWithContext, createToken } from "base";
+import { LoginRequest } from "./types/login-request";
+import { comparePasswords } from "../utils/encryption-utils";
 
 const router = express.Router();
 
-router.get("/:uid", async (req, res) => {
-	console.log(`user id request: ${req.params.uid}`);
+router.get("/:uid", jwtHandler, async (req: RequestWithContext, res) => {
 	try {
 		const id = req.params.uid;
 		const existingUser = await user.findOne({ id });
@@ -19,6 +20,49 @@ router.get("/:uid", async (req, res) => {
 
 		res.json({ existingUser });
 	} catch (error) {
+		res.status(500).json({ error });
+	}
+});
+
+router.get("/", async (req, res) => {
+	const users = await user.find({});
+
+	res.json({ users });
+});
+
+router.post("/login", async (req: TypedRequestBody<LoginRequest>, res) => {
+	try {
+		const { username, password } = req.body;
+
+		const existingUser = await user.findOne({
+			username,
+		});
+
+		if (!existingUser) {
+			console.error("username does not exist");
+
+			res.status(400).json({
+				error: "username does not exist",
+			});
+			return;
+		}
+
+		if (!(await comparePasswords(password, existingUser.password))) {
+			console.error("password is incorrect!");
+
+			res.status(401).json({
+				error: "password is incorrect!",
+			});
+			return;
+		}
+
+		console.error(process.env.SECRET_KEY);
+
+		const token = createToken({ userId: existingUser.id, isAdmin: false });
+
+		res.json({ token });
+	} catch (error) {
+		console.error(error);
 		res.status(500).json({ error });
 	}
 });
@@ -55,29 +99,22 @@ router.post(
 
 router.delete("/:uid", async (req, res) => {
 	try {
-		const authorization = req.header("authorization");
-		const token = authorization?.split(" ")?.[1];
 		const id = req.params.uid;
 
-		if (token) {
-			try {
-				const decoded = jwt.verify(token, process.env.SECRET_KEY || "");
+		try {
+			console.log(id);
+			const existingUser = await user.findOne({ id });
 
-				if (decoded !== id) {
-					res.status(401).json({ error: "unauthorized" });
-					return;
-				}
+			console.log(existingUser);
 
-				const existingUser = await user.findOne({ id });
-
-				if (!existingUser) {
-					res.status(401).json({ error: "unauthorized" });
-				}
-
-				user.deleteOne({ id });
-			} catch (e) {
+			if (!existingUser) {
 				res.status(401).json({ error: "unauthorized" });
 			}
+
+			await user.deleteOne({ id });
+			res.json({ status: "success" });
+		} catch (e) {
+			res.status(401).json({ error: "unauthorized" });
 		}
 	} catch (error) {
 		res.status(500).json({ error });
