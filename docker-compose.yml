@@ -1,4 +1,3 @@
-version: "3.8"
 services:
     notification-service:
         build:
@@ -39,11 +38,15 @@ services:
         build:
             context: ./user-service
         ports:
-            - 5005:5005
+            - $USER_PORT:$USER_PORT
         networks:
             - alon-network
         depends_on:
             - mongo
+            - authentication_service
+        environment:
+            - SECRET_KEY=${SECRET_KEY}
+            - USER_PORT=${USER_PORT}
 
     mongo:
         image: mongo
@@ -53,10 +56,13 @@ services:
             - mongo:/data/db
         networks:
             - alon-network
+
     redis:
-      image: redis
-      ports:
-        - 
+        image: redis:alpine
+        ports:
+            - ${REDIS_PORT}:${REDIS_PORT}
+        networks:
+          - alon-network
 
 volumes:
     mongo:

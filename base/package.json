@@ -1,0 +1,27 @@
+{
+	"devDependencies": {
+		"@types/express": "^5.0.0",
+		"@types/jsonwebtoken": "^9.0.7",
+		"tsup": "^8.3.5",
+		"typescript": "^5.7.2"
+	},
+	"name": "base",
+	"version": "1.0.0",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"module": "./dist/index.mjs",
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"description": "",
+	"dependencies": {
+		"base": "file:",
+		"jsonwebtoken": "^9.0.2"
+	},
+	"scripts": {
+		"build": "tsup"
+	},
+	"files": [
+		"dist"
+	]
+}
