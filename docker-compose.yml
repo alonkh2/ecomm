@@ -57,11 +57,26 @@ services:
             - alon-network
 
     redis:
-        image: redis:alpine
+        image: redis
         ports:
             - ${REDIS_PORT}:${REDIS_PORT}
         networks:
           - alon-network
+    
+    nginx:
+        image: nginx
+        ports:
+            - 80:80
+        volumes:
+            - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+        networks:
+            - alon-network
+        depends_on:
+            - notification-service
+            - payment-service
+            - product-service
+            - shopping-cart-service
+            - user-service
 
 volumes:
     mongo:

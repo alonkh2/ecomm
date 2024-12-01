@@ -1,5 +1,5 @@
 import { JobContext } from "./job-context";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 
 export const createToken = (context: JobContext) => {
 	return jwt.sign(context, process.env.SECRET_KEY || "");

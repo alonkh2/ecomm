@@ -5,7 +5,7 @@ import r from "base";
 
 const app = express();
 app.use(express.json());
-app.use("/users/", router);
+app.use("/", router);
 
 const PORT = process.env.USER_PORT || 5005;
 
