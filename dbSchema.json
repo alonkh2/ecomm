@@ -1,0 +1,62 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "products": {
+        "type": "object",
+        "properties": {
+          "productId": { "type": "string" },
+          "name": { "type": "string" },
+          "price": { "type": "number" },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "size": { "type": "number" },
+                "amount": { "type": "number" },
+                "reserved": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "reservationId": { "type": "string" },
+                      "quantity": { "type": "string" },
+                      "reservedSince": { "type": "string", "format": "date-time" }
+                    },
+                    "required": ["reservationId", "quantity", "reservedSince"]
+                  }
+                }
+              },
+              "required": ["size", "amount", "reserved"]
+            }
+          }
+        },
+        "required": ["productId", "name", "price", "items"]
+      },
+      "orders": {
+        "type": "object",
+        "properties": {
+          "orderId": { "type": "string" },
+          "userId": { "type": "string" },
+          "status": { "type": "string", "enum": ["pending", "confirmed", "shipped", "delivered", "cancelled"] },
+          "products": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "productId": { "type": "string" },
+                "size": { "type": "number" },
+                "quantity": { "type": "string" }
+              },
+              "required": ["productId", "size", "quantity"]
+            }
+          },
+          "placedOn": { "type": ["string", "null"], "format": "date-time" }
+        },
+        "required": ["orderId", "userId", "status", "products"]
+      }
+    },
+    "required": ["products", "orders"]
+  }
+  
