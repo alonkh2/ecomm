@@ -14,7 +14,7 @@
               "type": "object",
               "properties": {
                 "size": { "type": "number" },
-                "amount": { "type": "number" },
+                "stockAmount": { "type": "number" },
                 "reserved": {
                   "type": "array",
                   "items": {
@@ -28,7 +28,7 @@
                   }
                 }
               },
-              "required": ["size", "amount", "reserved"]
+              "required": ["size", "stockAmount", "reserved"]
             }
           }
         },
