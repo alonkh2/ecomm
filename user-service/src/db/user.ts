@@ -7,6 +7,7 @@ const User = new Schema({
 	email: { type: String, required: true },
 	name: { type: String, required: true },
 	password: { type: String, required: true },
+	isAdmin: { type: Boolean, required: true, default: false },
 });
 
 User.pre(
@@ -15,7 +16,7 @@ User.pre(
 		if (!this.isModified("password")) return next();
 
 		try {
-			this.password = await generatePasswordHash(this.password)
+			this.password = await generatePasswordHash(this.password);
 			next();
 		} catch (err) {
 			next(err as mongoose.CallbackError);

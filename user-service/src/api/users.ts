@@ -1,28 +1,46 @@
 import express from "express";
-import { TypedRequestBody } from "./types/express";
 import { RegisterRequest } from "./types/register-request";
 import user from "../db/user";
-import { jwtHandler, RequestWithContext, createToken } from "base";
+import {
+	jwtHandler,
+	RequestWithContext,
+	createToken,
+	TypedRequestBody,
+} from "base";
 import { LoginRequest } from "./types/login-request";
 import { comparePasswords } from "../utils/encryption-utils";
 
 const router = express.Router();
 
-router.get("/:uid", jwtHandler, async (req: RequestWithContext, res) => {
-	try {
-		const id = req.params.uid;
-		const existingUser = await user.findOne({ id });
-
-		if (!existingUser) {
-			res.status(404).json({ error: `no user with id ${id}` });
-			return;
+router.get(
+	"/:uid",
+	jwtHandler((context, req) => {
+		if (req.params.uid !== context.userId && !context.isAdmin) {
+			return {
+				authorizationStatus: false,
+				reasonPhrase:
+					"non admin user cannot get users other than itself",
+			};
 		}
 
-		res.json({ existingUser });
-	} catch (error) {
-		res.status(500).json({ error });
+		return { authorizationStatus: true };
+	}),
+	async (req: RequestWithContext, res) => {
+		try {
+			const id = req.params.uid;
+			const existingUser = await user.findOne({ id });
+
+			if (!existingUser) {
+				res.status(404).json({ error: `no user with id ${id}` });
+				return;
+			}
+
+			res.json({ existingUser });
+		} catch (error) {
+			res.status(500).json({ error });
+		}
 	}
-});
+);
 
 router.get("/", async (req, res) => {
 	const users = await user.find({});
@@ -58,7 +76,10 @@ router.post("/login", async (req: TypedRequestBody<LoginRequest>, res) => {
 
 		console.error(process.env.SECRET_KEY);
 
-		const token = createToken({ userId: existingUser.id, isAdmin: false });
+		const token = createToken({
+			userId: existingUser.id,
+			isAdmin: existingUser.isAdmin,
+		});
 
 		res.json({ token });
 	} catch (error) {
@@ -108,7 +129,9 @@ router.delete("/:uid", async (req, res) => {
 			console.log(existingUser);
 
 			if (!existingUser) {
-				res.status(401).json({ error: "unauthorized" });
+				res.status(401).json({
+					error: "user with this id does not exist",
+				});
 			}
 
 			await user.deleteOne({ id });
